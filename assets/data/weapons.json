@@ -69,7 +69,7 @@
     "subtitle": "AZURE-GLASS · MOUNTAIN BREAKER",
     "theme": { "deep": "#4074b4", "mid": "#0D0F14", "accent": "#4A7B9D" },
     "image": "",
-    "model": "assets/models/Project2.glb",
+    "model": "assets/models/project2.glb",
     "camera": { "pos": [3.0, 1, 5.5], "target": [0, 0, 0] },
     "description": "由垂落而下的月光凝结而成的水晶，以它自己本身的意志延伸出了角质，它们化作了形似武器的形状，却并非由人所制造打磨。\n它的诞生本身便是奇迹。如此，自然也拥有着奇迹一般的力量。",
     "stats": {
