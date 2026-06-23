@@ -1,0 +1,517 @@
+/* ============================================================
+   岁月武库 · 武器图鉴 — 本地字体
+   路径相对于本 CSS 文件所在目录 assets/css/
+============================================================ */
+@font-face {
+  font-family: 'Noto Serif SC';
+  src: url('../fonts/NotoSerifSC[wght].ttf') format('truetype');
+  font-weight: 500 900;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Noto Sans SC';
+  src: url('../fonts/NotoSansSC[wght].ttf') format('truetype');
+  font-weight: 300 700;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'JetBrains Mono';
+  src: url('../fonts/JetBrainsMono[wght].ttf') format('truetype');
+  font-weight: 400 600;
+  font-display: swap;
+}
+
+/* ============================================================
+   岁月武库 · 武器图鉴
+   说明：所有武器数据由 Vue 3 从 assets/data/weapons.json 加载。
+   以后新增武器只需修改 weapons.json，不需要改动 HTML/CSS。
+   ============================================================ */
+
+:root{
+  /* 基底（无武器选中 / 过渡用） */
+  --void-0: #07080a;
+  --void-1: #0b0d10;
+  --ink: #f2ede4;
+  --ink-dim: rgba(242,237,228,0.62);
+  --ink-faint: rgba(242,237,228,0.32);
+  --hairline: rgba(242,237,228,0.14);
+
+  /* 当前主题色（由 Vue 在切换武器时改写） */
+  --theme-deep: #0b0d10;
+  --theme-mid: #14171c;
+  --theme-accent: #c9a36a;
+  --theme-accent-soft: rgba(201,163,106,0.35);
+
+  --ease-out: cubic-bezier(.16,.8,.24,1);
+}
+
+*{ box-sizing: border-box; }
+html,body{ margin:0; padding:0; }
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 22% 30%, var(--theme-mid) 0%, transparent 55%),
+    radial-gradient(circle at 78% 70%, var(--theme-deep) 0%, transparent 60%),
+    var(--void-0);
+  background-color: var(--void-0);
+  color: var(--ink);
+  font-family: "Noto Sans SC", sans-serif;
+  overflow-x:hidden;
+  transition: background-color 1.1s var(--ease-out);
+}
+
+/* 全局过渡：背景色渐变到主题色 */
+.theme-wash{
+  position:fixed; inset:0;
+  z-index:0;
+  pointer-events:none;
+  background:
+    radial-gradient(ellipse 80% 60% at 50% 38%, var(--theme-mid) 0%, transparent 62%),
+    radial-gradient(ellipse 120% 90% at 50% 100%, var(--theme-deep) 0%, transparent 70%);
+  opacity:0;
+  transition: opacity 1.3s var(--ease-out), background 1.3s var(--ease-out);
+}
+.theme-wash.active{ opacity:1; }
+
+/* ============ 顶部铭牌 ============ */
+.masthead{
+  position:relative; z-index:3;
+  text-align:center;
+  padding: 38px 20px 8px;
+}
+.masthead .eyebrow{
+  font-family:"JetBrains Mono", monospace;
+  font-size:11px;
+  letter-spacing:.32em;
+  color: var(--ink-faint);
+  text-transform:uppercase;
+}
+.masthead h1{
+  font-family:"Noto Serif SC", serif;
+  font-weight:900;
+  font-size: clamp(28px, 4vw, 42px);
+  letter-spacing:.06em;
+  margin: 6px 0 0;
+  background: linear-gradient(180deg, var(--ink) 0%, var(--ink-dim) 100%);
+  -webkit-background-clip:text;
+  background-clip:text;
+  -webkit-text-fill-color:transparent;
+}
+
+/* ============ 左侧武器选择栏 ============ */
+.armory-rail{
+  position:fixed;
+  left:0; top:0; bottom:0;
+  width: 110px;
+  z-index: 20;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  gap: 14px;
+  padding-left: 18px;
+}
+
+.weapon-pill{
+  position:relative;
+  width: 168px;
+  height: 46px;
+  border-radius: 999px;
+  border: 1px solid var(--hairline);
+  background: rgba(15,16,19,0.55);
+  backdrop-filter: blur(6px);
+  color: var(--ink-dim);
+  font-family:"Noto Serif SC", serif;
+  font-size: 15px;
+  letter-spacing:.05em;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+
+  opacity: 0;
+  transform: translateX(-46px);
+  transition:
+    opacity .55s var(--ease-out),
+    transform .55s var(--ease-out),
+    border-color .35s ease,
+    color .35s ease,
+    background .35s ease,
+    box-shadow .35s ease;
+}
+
+/* 鼠标静止时隐藏，移动鼠标 / 靠近左边时显现 */
+.armory-rail.is-visible .weapon-pill{
+  opacity: 1;
+  transform: translateX(0);
+}
+.armory-rail:not(.is-visible) .weapon-pill{
+  opacity: 0;
+  transform: translateX(-46px);
+  pointer-events: none;
+}
+/* 已选中的按钮即便鼠标静止也保留一点存在感 */
+.armory-rail:not(.is-visible) .weapon-pill.is-active{
+  opacity: 0.85;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.weapon-pill:hover{
+  border-color: var(--theme-accent-soft);
+  color: var(--ink);
+  background: rgba(20,21,25,0.75);
+}
+
+.weapon-pill.is-active{
+  color: var(--ink);
+  background: var(--theme-accent);
+  border-color: var(--theme-accent);
+  box-shadow: 0 0 0 1px var(--theme-accent-soft), 0 10px 28px -8px var(--theme-accent-soft);
+  font-weight:700;
+}
+
+.weapon-pill .pip{
+  position:absolute;
+  left: -18px;
+  width:6px; height:6px;
+  border-radius:50%;
+  background: var(--theme-accent);
+  opacity:0;
+  transition: opacity .35s ease;
+}
+.weapon-pill.is-active .pip{ opacity:1; }
+
+/* 序号小标签，给选择栏一点系统感 */
+.rail-index{
+  position: fixed;
+  left: 18px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 19;
+  font-family:"JetBrains Mono", monospace;
+  font-size: 10px;
+  color: var(--ink-faint);
+  letter-spacing: .25em;
+  writing-mode: vertical-rl;
+  text-transform: uppercase;
+  opacity: .5;
+  pointer-events: none;
+}
+
+/* ============ 主舞台 ============ */
+.stage{
+  position:relative; z-index:2;
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 160px 60px 80px 150px;
+}
+
+.weapon-name-banner{
+  text-align:center;
+  margin-bottom: -10px;
+}
+.weapon-name-banner .sub{
+  font-family:"JetBrains Mono", monospace;
+  font-size:11px;
+  color: var(--theme-accent);
+  letter-spacing:.3em;
+  text-transform:uppercase;
+  opacity:.85;
+}
+.weapon-name-banner h2{
+  font-family:"Noto Serif SC", serif;
+  font-weight:900;
+  font-size: clamp(34px, 5vw, 56px);
+  margin: 4px 0 0;
+  letter-spacing: .04em;
+  color: var(--ink);
+  text-shadow: 0 0 40px var(--theme-accent-soft);
+}
+
+/* 主展示区：图片 + 右侧状态栏 */
+.display-area{
+  display:grid;
+  grid-template-columns: 1.15fr 0.85fr;
+  align-items:center;
+  gap: 26px;
+  margin-top: 18px;
+  min-height: 420px;
+}
+
+/* 图片舞台 + 召唤纹环 */
+.image-stage{
+  position:relative;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  height: 420px;
+}
+
+.sigil-ring{
+  position:absolute;
+  width: 320px; height: 320px;
+  border-radius: 50%;
+  border: 1px dashed var(--theme-accent-soft);
+  opacity:0;
+  animation: spin-slow 40s linear infinite;
+}
+.sigil-ring.ring-2{
+  width: 380px; height: 380px;
+  border-style: solid;
+  border-width: 1px;
+  border-color: var(--theme-accent-soft);
+  animation-duration: 60s;
+  animation-direction: reverse;
+}
+.image-stage.is-active .sigil-ring{
+  opacity: 1;
+  transition: opacity 1s var(--ease-out) .2s;
+}
+
+.glow-floor{
+  position:absolute;
+  bottom: 18px;
+  width: 280px; height: 60px;
+  background: radial-gradient(ellipse at center, var(--theme-accent-soft) 0%, transparent 72%);
+  filter: blur(2px);
+  opacity:0;
+  transition: opacity 1s var(--ease-out) .3s;
+}
+.image-stage.is-active .glow-floor{ opacity:.9; }
+
+.weapon-portrait{
+  position:relative;
+  z-index:2;
+  width: min(280px, 70%);
+  max-height: 360px;
+  object-fit: contain;
+  filter: drop-shadow(0 18px 40px rgba(0,0,0,0.55)) drop-shadow(0 0 24px var(--theme-accent-soft));
+
+  opacity:0;
+  transform: translateY(64px) scale(.94);
+  transition: opacity .9s var(--ease-out), transform .9s var(--ease-out);
+}
+.image-stage.is-active .weapon-portrait{
+  opacity:1;
+  transform: translateY(0) scale(1);
+}
+
+@keyframes spin-slow{
+  from{ transform: rotate(0deg); }
+  to{ transform: rotate(360deg); }
+}
+
+/* ============ 右侧状态栏 ============ */
+.stat-ledger{
+  display:flex;
+  flex-direction:column;
+  border-top: 1px solid var(--hairline);
+}
+
+.stat-row{
+  display:grid;
+  grid-template-columns: 96px 1fr;
+  gap: 14px;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--hairline);
+
+  opacity:0;
+  transform: translateX(18px);
+  transition: opacity .5s var(--ease-out), transform .5s var(--ease-out);
+}
+.stat-ledger.is-active .stat-row{
+  opacity:1;
+  transform: translateX(0);
+}
+/* 逐行错落出现 */
+.stat-ledger.is-active .stat-row:nth-child(1){ transition-delay: .05s; }
+.stat-ledger.is-active .stat-row:nth-child(2){ transition-delay: .12s; }
+.stat-ledger.is-active .stat-row:nth-child(3){ transition-delay: .19s; }
+.stat-ledger.is-active .stat-row:nth-child(4){ transition-delay: .26s; }
+.stat-ledger.is-active .stat-row:nth-child(5){ transition-delay: .33s; }
+.stat-ledger.is-active .stat-row:nth-child(6){ transition-delay: .40s; }
+
+.stat-label{
+  font-family:"JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing:.06em;
+  color: var(--theme-accent);
+  text-transform: uppercase;
+  padding-top: 2px;
+}
+.stat-label .label-cn{
+  display:block;
+  font-family:"Noto Sans SC", sans-serif;
+  font-size: 13px;
+  color: var(--ink-dim);
+  letter-spacing: normal;
+  text-transform:none;
+  margin-top: 3px;
+}
+
+/* 绝技 / 战技 / 被动 高亮发光 */
+.stat-row[data-key="active1"] .label-cn,
+.stat-row[data-key="active2"] .label-cn,
+.stat-row[data-key="passive1"] .label-cn,
+.stat-row[data-key="passive2"] .label-cn {
+  color: var(--theme-accent);
+  text-shadow: 0 0 10px var(--theme-accent-soft), 0 0 20px var(--theme-accent-soft);
+}
+
+.stat-value{
+  font-size: 13.5px;
+  line-height: 1.65;
+  color: var(--ink);
+}
+.stat-value .num{
+  font-family:"JetBrains Mono", monospace;
+  font-size: 20px;
+  font-weight:600;
+  color: var(--ink);
+  margin-right: 6px;
+}
+.stat-value .skill-name{
+  display:inline-block;
+  font-weight:700;
+  color: var(--theme-accent);
+  margin-bottom: 3px;
+}
+.stat-value p{ margin: 0; }
+
+/* ============ 描述区（占位） ============ */
+.lore-panel{
+  margin-top: 56px;
+  padding-top: 28px;
+  border-top: 1px solid var(--hairline);
+
+  opacity:0;
+  transform: translateY(14px);
+  transition: opacity .7s var(--ease-out) .25s, transform .7s var(--ease-out) .25s;
+}
+.lore-panel.is-active{
+  opacity:1;
+  transform: translateY(0);
+}
+.lore-panel .eyebrow{
+  font-family:"JetBrains Mono", monospace;
+  font-size: 11px;
+  letter-spacing:.3em;
+  color: var(--theme-accent);
+  text-transform:uppercase;
+  opacity:.85;
+}
+.lore-panel h3{
+  font-family:"Noto Serif SC", serif;
+  font-size: 22px;
+  margin: 8px 0 14px;
+  color: var(--ink);
+}
+.lore-panel p{
+  max-width: 720px;
+  font-size: 14.5px;
+  line-height: 1.9;
+  color: var(--ink-dim);
+  margin: 0 0 12px;
+}
+.lore-panel .placeholder-tag{
+  display:inline-block;
+  margin-top: 6px;
+  font-family:"JetBrains Mono", monospace;
+  font-size: 10.5px;
+  letter-spacing: .12em;
+  color: var(--ink-faint);
+  border: 1px dashed var(--hairline);
+  border-radius: 999px;
+  padding: 4px 12px;
+}
+
+/* ============ 占位图样式（武器图片占位符）============ */
+.placeholder-art{
+  width: 100%; height: 100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+}
+
+/* ============ 响应式 ============ */
+@media (max-width: 860px){
+  .stage{ padding: 10px 24px 60px 110px; }
+  .display-area{ grid-template-columns: 1fr; }
+  .image-stage{ height: 320px; }
+  .armory-rail{ width: 96px; }
+  .weapon-pill{ width: 140px; height:42px; font-size:13px; }
+}
+
+/* ============ 自动旋转控制按钮 ============ */
+.rotate-control {
+  position: absolute;
+  bottom: -44px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+}
+.rotate-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 28px;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: rgba(15,16,19,0.55);
+  backdrop-filter: blur(6px);
+  color: var(--ink-dim);
+  font-family: "Noto Sans SC", sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  transition: all .35s var(--ease-out);
+  user-select: none;
+}
+.rotate-toggle:hover {
+  border-color: var(--theme-accent-soft);
+  color: var(--ink);
+  background: rgba(20,21,25,0.75);
+}
+.rotate-toggle.is-active {
+  color: var(--theme-accent);
+  border-color: var(--theme-accent-soft);
+}
+.rotate-toggle .indicator {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  background: var(--theme-accent);
+  box-shadow: 0 0 8px var(--theme-accent-soft);
+  transition: opacity .35s ease, box-shadow .35s ease;
+}
+.rotate-toggle.paused .indicator {
+  opacity: 0.3;
+  box-shadow: none;
+}
+
+/* ============ 可访问性 ============ */
+.weapon-pill:focus-visible,
+.lore-panel a:focus-visible{
+  outline: 2px solid var(--theme-accent);
+  outline-offset: 2px;
+}
+
+@media (prefers-reduced-motion: reduce){
+  *{ animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
+
+/* ============ Three.js 3D 渲染容器 ============ */
+#threeContainer {
+  position: absolute;
+  z-index: 2;
+  inset: 0;
+  opacity: 0;
+  transition: opacity .9s var(--ease-out);
+}
+#threeContainer.is-active {
+  opacity: 1;
+}
+#threeContainer canvas {
+  display: block;
+  width: 100% !important;
+  height: 100% !important;
+}

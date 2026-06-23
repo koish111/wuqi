@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>岁月武库 · 武器图鉴</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="assets/css/style.css">
+<script type="importmap">
+{
+  "imports": {
+    "three": "./assets/three/build/three.module.js",
+    "three/addons/": "./assets/three/examples/jsm/"
+  }
+}
+</script>
+<script src="assets/utils/vue.global.js"></script>
+</head>
+<body>
+
+<div id="app">
+  <div class="theme-wash" :class="{ active: activeWeapon != null }"></div>
+
+  <div class="rail-index">岁月武库 · ARMORY INDEX</div>
+
+  <nav class="armory-rail"
+       :class="{ 'is-visible': railVisible }"
+       @mouseenter="clearHideTimer"
+       @mouseleave="startHideTimer"
+       aria-label="武器选择">
+    <button v-for="w in weapons" :key="w.id"
+            class="weapon-pill"
+            :class="{ 'is-active': activeId === w.id }"
+            type="button"
+            @click="selectWeapon(w.id)">
+      <span class="pip"></span>{{ w.name }}
+    </button>
+  </nav>
+
+  <header class="masthead">
+    <div class="eyebrow">YEARS OF THE BLADE · WEAPON CODEX</div>
+    <h1>岁月武库</h1>
+  </header>
+
+  <main class="stage">
+
+    <div class="weapon-name-banner" :style="{ visibility: activeWeapon ? 'visible' : 'hidden' }">
+      <div class="sub">WEAPON FILE</div>
+      <h2>{{ activeWeapon ? activeWeapon.name : '—' }}</h2>
+    </div>
+
+    <section class="display-area">
+      <div class="image-stage" :class="{ 'is-active': stageActive }">
+        <div class="sigil-ring"></div>
+        <div class="sigil-ring ring-2"></div>
+        <div class="glow-floor"></div>
+        <img class="weapon-portrait"
+             v-show="activeWeapon && !activeWeapon.model"
+             :src="activeWeapon ? (activeWeapon.image || placeholderSrc(activeWeapon)) : ''"
+             :alt="activeWeapon ? activeWeapon.name : ''">
+        <div id="threeContainer"
+             v-show="activeWeapon && activeWeapon.model"
+             :class="{ 'is-active': stageActive }"></div>
+        <div class="rotate-control" v-if="activeWeapon && activeWeapon.model">
+          <button class="rotate-toggle is-active" id="rotateToggle">
+            <span class="indicator"></span>
+            <span class="label">自动旋转中</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="stat-ledger" :class="{ 'is-active': stageActive }">
+        <div v-for="row in statRows" :key="row.key" class="stat-row" :data-key="row.key">
+          <div class="stat-label">{{ row.labelEn }}<span class="label-cn">{{ row.labelCn }}</span></div>
+          <div class="stat-value" v-html="row.html"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lore-panel" :class="{ 'is-active': stageActive }">
+      <div class="eyebrow">DESCRIPTION</div>
+      <h3>{{ activeWeapon ? activeWeapon.name + ' · 简介' : '武器描述' }}</h3>
+      <p>{{ activeWeapon ? activeWeapon.description : '这里是武器背景故事 / 描述文字的占位内容。' }}</p>
+      <span class="placeholder-tag">PLACEHOLDER TEXT — 待替换</span>
+    </section>
+
+  </main>
+</div>
+
+<!-- Vue 3 应用逻辑 -->
+<script src="assets/js/app.js"></script>
+
+<!-- Three.js 3D 渲染模块（使用 importmap） -->
+<script type="module" src="assets/js/three-renderer.js"></script>
+
+</body>
+</html>
